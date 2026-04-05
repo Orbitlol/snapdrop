@@ -1,9 +1,8 @@
 {
   "name": "snapdrop",
   "version": "1.0.0",
-  "description": "SnapDrop - YouTube & Instagram Downloader",
   "dependencies": {
-    "@distube/ytdl-core": "^4.16.8"
+    "@ybd-project/ytdl-core": "latest"
   },
   "engines": {
     "node": "24.x"
