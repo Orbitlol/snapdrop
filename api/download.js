@@ -1,5 +1,11 @@
 import { YtdlCore, toPipeableStream } from '@ybd-project/ytdl-core/serverless';
 
+const ytdl = new YtdlCore({
+  disablePoTokenAutoGeneration: false,
+  hl: 'en',
+  gl: 'US',
+});
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -9,9 +15,8 @@ export default async function handler(req, res) {
   if (!url) return res.status(400).json({ error: 'Missing url parameter' });
 
   try {
-    const ytdl = new YtdlCore({});
     const info = await ytdl.getBasicInfo(url);
-    const title = info.videoDetails.title.replace(/[^\w\s-]/g, '').trim();
+    const title = (info.videoDetails?.title || 'video').replace(/[^\w\s-]/g, '').trim();
 
     if (format === 'info') {
       return res.status(200).json({
@@ -24,9 +29,7 @@ export default async function handler(req, res) {
       });
     }
 
-    let qualityOptions;
-    let filename;
-    let contentType;
+    let qualityOptions, filename, contentType;
 
     if (format === 'audio') {
       qualityOptions = { quality: 'highestaudio', filter: 'audioonly' };
@@ -49,7 +52,9 @@ export default async function handler(req, res) {
     toPipeableStream(stream).pipe(res);
 
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Download failed. The video may be unavailable.' });
+    console.error('Download error:', err?.message || err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Download failed — YouTube may be blocking this request. Try again in a moment.' });
+    }
   }
 }
