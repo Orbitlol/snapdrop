@@ -953,7 +953,9 @@
         setHelper('Getting your download ready\u2026');
 
         try {
-          const infoRes = await fetch(`/api/download?url=${encodeURIComponent(currentItem.source)}&format=info`);
+          // Replace YOUR_RENDER_URL with your actual Render app URL e.g. https://snapdrop.onrender.com
+          const API = 'https://YOUR_RENDER_URL.onrender.com';
+          const infoRes = await fetch(`${API}/api/info?url=${encodeURIComponent(currentItem.source)}`);
           const text = await infoRes.text();
 
           let info;
