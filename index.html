@@ -1,25 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="google-site-verification" content="RyRogTHbTk3FEBEnRyAPHwRAIju8Q5dSqEXu1fcspmA" /> 
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SnapDrop — Download YouTube Shorts & Instagram Reels Free</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnapDrop — YouTube & Instagram Link Downloader</title>
 
-<meta name="description" content="SnapDrop lets you download YouTube Shorts and Instagram Reels for free — no app, no sign-up. Paste your link, preview instantly, and save as MP4 or MP3 in seconds." />
-<meta name="keywords" content="youtube shorts downloader, instagram reel downloader, download youtube shorts, save instagram reels, shorts to mp4, reel downloader online, free video downloader no app, download reels without watermark, youtube shorts to mp3, snapdrop downloader" />
-<meta name="author" content="SnapDrop" />
-<meta name="robots" content="index, follow" />
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="SnapDrop lets you download YouTube Shorts and Instagram Reels for free — no app, no sign-up. Paste your link, preview instantly, and save as MP4 or MP3 in seconds." />
+  <meta name="keywords" content="youtube shorts downloader, instagram reel downloader, download youtube shorts, save instagram reels, shorts to mp4, reel downloader online, free video downloader no app, download reels without watermark, youtube shorts to mp3, snapdrop downloader" />
+  <meta name="author" content="SnapDrop" />
+  <meta name="robots" content="index, follow" />
 
-<meta property="og:type" content="website" />
-<meta property="og:title" content="SnapDrop — Download YouTube Shorts & Instagram Reels Free" />
-<meta property="og:description" content="The easiest way to download YouTube Shorts and Instagram Reels. No app, no watermark, no sign-up. Just paste your link and save." />
-<meta property="og:image" content="https://snapdrop.vercel.app/og-image.png" />
-<meta property="og:url" content="https://snapdrop.vercel.app" />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="SnapDrop — Download YouTube Shorts & Instagram Reels Free" />
+  <meta property="og:description" content="The easiest way to download YouTube Shorts and Instagram Reels. No app, no watermark, no sign-up. Just paste your link and save." />
+  <meta property="og:image" content="https://snapdrop.vercel.app/og-image.png" />
+  <meta property="og:url" content="https://snapdrop.vercel.app" />
 
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="SnapDrop — Download YouTube Shorts & Instagram Reels Free" />
-<meta name="twitter:description" content="The easiest way to download YouTube Shorts and Instagram Reels. No app, no watermark, no sign-up." />  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SnapDrop — Download YouTube Shorts & Instagram Reels Free" />
+  <meta name="twitter:description" content="The easiest way to download YouTube Shorts and Instagram Reels. No app, no watermark, no sign-up." />
   <style>
     :root{
       --bg:#fdf6ef;
@@ -951,16 +953,18 @@
         setHelper('Getting your download ready\u2026');
 
         try {
-          // First fetch info to get the download link
           const infoRes = await fetch(`/api/download?url=${encodeURIComponent(currentItem.source)}&format=info`);
-          const info = await infoRes.json();
+          const text = await infoRes.text();
+
+          let info;
+          try { info = JSON.parse(text); }
+          catch { throw new Error('Server error — try again in a moment.'); }
 
           if (!infoRes.ok || info.error) throw new Error(info.error || 'Failed to get video info');
 
           const downloadUrl = info.formats[apiFormat];
           if (!downloadUrl) throw new Error('That format is not available for this video.');
 
-          // Trigger the download
           const a = document.createElement('a');
           a.href = downloadUrl;
           a.click();
