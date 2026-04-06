@@ -704,22 +704,28 @@
           </div>
 
           <div class="action-stack">
-            <button class="action primary" type="button" data-action="1080p 60fps">
+            <button class="action primary" type="button" data-action="1080p">
               <span>Download in 1080p 60fps</span>
               <span class="action-icon" aria-hidden="true">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4v12m0 0-4-4m4 4 4-4M4 20h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
             </button>
-            <button class="action secondary" type="button" data-action="High Quality Audio">
+            <button class="action secondary" type="button" data-action="720p">
+              <span>Download in 720p 60fps</span>
+              <span class="action-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4v12m0 0-4-4m4 4 4-4M4 20h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </button>
+            <button class="action tertiary" type="button" data-action="480p">
+              <span>Download in 480p</span>
+              <span class="action-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4v12m0 0-4-4m4 4 4-4M4 20h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </button>
+            <button class="action tertiary" type="button" data-action="audio">
               <span>Download Audio Only (MP3)</span>
               <span class="action-icon" aria-hidden="true">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="2"/></svg>
-              </span>
-            </button>
-            <button class="action tertiary" type="button" data-action="1080p 30fps">
-              <span>Download Video in 1080p 30fps</span>
-              <span class="action-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4v12m0 0-4-4m4 4 4-4M4 20h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
             </button>
             <button class="action tertiary" type="button" id="shareBtn">
@@ -945,9 +951,8 @@
         }
 
         const format = btn.dataset.action;
-        const isAudio = format.toLowerCase().includes('audio');
-        const is1080 = format.includes('1080p 60fps') || format.includes('1080p 30fps');
-        const apiFormat = isAudio ? 'audio' : (is1080 ? 'video1080' : 'video720');
+        const isAudio = format === 'audio';
+        const apiFormat = isAudio ? 'audio' : format; // '1080p', '720p', '480p'
 
         btn.disabled = true;
         btn.innerHTML = '<span>Preparing download\u2026</span><span class="spinner" aria-hidden="true"></span>';
