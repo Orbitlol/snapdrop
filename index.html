@@ -722,11 +722,17 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4v12m0 0-4-4m4 4 4-4M4 20h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
             </button>
+            <button class="action tertiary" type="button" id="shareBtn">
+              <span>Share SnapDrop</span>
+              <span class="action-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="2"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </span>
+            </button>
           </div>
         </div>
       </article>
 
-      <div class="footer-note">For public links only. Clicking a download button opens <a href="https://cobalt.tools" target="_blank" rel="noopener noreferrer" style="color:var(--primary-3);font-weight:700;">cobalt.tools</a> with your link ready — free, no ads, no sign-up.</div>
+      <div class="footer-note">For public links only. Supports YouTube videos, Shorts & Instagram reels.</div>
     </section>
   </main>
 
@@ -933,13 +939,8 @@
       btn.dataset.original = btn.innerHTML;
       btn.addEventListener('click', async () => {
         if (!currentItem) {
-          showToast('Load a link preview before choosing a format.', 'error');
-          setHelper('Load a link first to unlock the download actions.', 'error');
-          return;
-        }
-
-        if (currentItem.platform !== 'youtube') {
-          showToast('Instagram downloads are not supported yet — only YouTube links.', 'error');
+          showToast('Paste a link first and hit Get Download Options.', 'error');
+          setHelper('Load a link first to unlock downloads.', 'error');
           return;
         }
 
@@ -953,16 +954,22 @@
         setHelper('Getting your download ready\u2026');
 
         try {
-          // Replace YOUR_RENDER_URL with your actual Render app URL e.g. https://snapdrop.onrender.com
           const API = 'https://snapdrop-dl3p.onrender.com';
           const infoRes = await fetch(`${API}/api/info?url=${encodeURIComponent(currentItem.source)}`);
           const text = await infoRes.text();
 
           let info;
           try { info = JSON.parse(text); }
-          catch { throw new Error('Server error — try again in a moment.'); }
+          catch { throw new Error('Server is waking up — wait 30 seconds and try again.'); }
 
-          if (!infoRes.ok || info.error) throw new Error(info.error || 'Failed to get video info');
+          if (!infoRes.ok || info.error) {
+            // Friendlier error messages
+            const msg = info.error || '';
+            if (msg.includes('bot') || msg.includes('Sign in')) throw new Error('YouTube is blocking this request — try again in a moment.');
+            if (msg.includes('private')) throw new Error('This video is private and cannot be downloaded.');
+            if (msg.includes('unavailable')) throw new Error('This video is unavailable in your region.');
+            throw new Error('Download failed — please try again.');
+          }
 
           const downloadUrl = info.formats[apiFormat];
           if (!downloadUrl) throw new Error('That format is not available for this video.');
@@ -976,14 +983,37 @@
 
         } catch (err) {
           console.error(err);
-          showToast(err.message || 'Download failed. Try a different format.', 'error');
-          setHelper(err.message || 'Download failed.', 'error');
+          showToast(err.message || 'Something went wrong — please try again.', 'error');
+          setHelper(err.message || 'Something went wrong.', 'error');
         } finally {
           btn.disabled = false;
           btn.innerHTML = btn.dataset.original;
         }
       });
     });
+
+    // Share button
+    const shareBtn = document.getElementById('shareBtn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', async () => {
+        const shareData = {
+          title: 'SnapDrop',
+          text: 'Download YouTube videos, Shorts & Instagram Reels for free!',
+          url: window.location.href,
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else {
+            await navigator.clipboard.writeText(window.location.href);
+            showToast('Link copied to clipboard!', 'success');
+          }
+        } catch (err) {
+          await navigator.clipboard.writeText(window.location.href);
+          showToast('Link copied to clipboard!', 'success');
+        }
+      });
+    }
 
     urlInput.addEventListener('input', () => {
       if (inputWrap.classList.contains('has-error')) {
