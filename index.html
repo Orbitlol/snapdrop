@@ -969,7 +969,8 @@
           if (!infoRes.ok || info.error) {
             // Friendlier error messages
             const msg = info.error || '';
-            if (msg.includes('bot') || msg.includes('Sign in')) throw new Error('YouTube is blocking this request — try again in a moment.');
+            if (msg.includes('Sign in')) throw new Error('YouTube is blocking this request — try again in a moment.');
+            if (msg includes('Bot')) throw new Error('Youtube detected a bot — try again later.');
             if (msg.includes('private')) throw new Error('This video is private and cannot be downloaded.');
             if (msg.includes('unavailable')) throw new Error('This video is unavailable in your region.');
             throw new Error('Download failed — please try again.');
